@@ -1,5 +1,5 @@
 Bootstrap: shub
-From: bsmind/hello-world:latest
+From: bsmind/hello-world
 
 
 %labels
