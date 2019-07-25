@@ -1,5 +1,5 @@
 Bootstrap: shub
-From: bsmind/hello-world
+From: bsmind/ChimbukoHubs:base
 
 
 %labels
