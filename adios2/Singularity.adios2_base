@@ -1,0 +1,75 @@
+Bootstrap: shub
+From: bsmind/ChimbukoHubs:ubuntu
+
+
+%labels
+    MAINTAINER Sungsoo Ha (sungsooha@bnl.gov)
+
+%post
+    # Number of jobs when compiling
+    JOBS=4
+
+    # create directory
+    mkdir -p /Downloads
+
+    # download ADIOSVM
+    mkdir -p /Downloads/adiosvm
+    git clone https://github.com/pnorbert/adiosvm.git /Downloads/adiosvm
+
+    # ------------------------------------------------------------------------
+    # Preparations to install ADIOS
+    # ------------------------------------------------------------------------
+    export PATH=${PATH}:/opt/cmake-3.13.4-Linux-x86_64/bin
+    . /opt/venv/bin/activate
+
+
+    # 1. Staging support
+    # a. libfabric is requried by the SST staging engine
+    cd /Downloads
+    wget https://github.com/ofiwg/libfabric/releases/download/v1.7.0/libfabric-1.7.0.tar.gz
+    tar xvfz libfabric-1.7.0.tar.gz
+    cd /Downloads/libfabric-1.7.0
+    ./configure --disable-verbs --prefix=/opt/libfabric
+    make
+    make install
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/libfabric/lib
+
+    # b. ZeroMQ is required by the DataMan staging engine
+    apt-get install -y libzmq5 libzmq3-dev
+
+    # 2. Compression libraries
+    apt-get install -y bzip2 libbz2-dev zlib1g zlib1g-dev
+
+    cd /Downloads/adiosvm/adiospackages
+    tar zxf sz-1.4.13.0.tar.gz
+    cd /Downloads/adiosvm/adiospackages/sz-1.4.13.0
+    ./configure --prefix=/opt/SZ --with-pic --disable-shared --disable-fortran --disable-maintainer-mode
+    make
+    make install
+
+    cd /Downloads
+    git clone https://github.com/Blosc/c-blosc.git
+    mkdir -p /Downloads/c-blosc/build
+    cd /Downloads/c-blosc/build
+    cmake -DCMAKE_INSTALL_PREFIX=/opt/blosc ..
+    make 
+    make install
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/blosc/lib
+
+    # 5. Parallel HDF5 
+    cd /Downloads/adiosvm/adiospackages
+    tar jxf hdf5-1.8.17.tar.bz2
+    mv hdf5-1.8.17 hdf5-1.8.17-parallel
+    cd /Downloads/adiosvm/adiospackages/hdf5-1.8.17-parallel
+    ./configure --with-zlib=/usr --without-szlib --prefix=/opt/hdf5-parallel --enable-parallel --enable-fortran --with-pic CC=mpicc FC=mpif90
+    make -j$JOBS
+    make install
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/hdf5-parallel/lib
+
+%environment
+    . /opt/venv/bin/activate
+    export PATH=${PATH}:/opt/cmake-3.13.4-Linux-x86_64/bin
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/libfabric/lib
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/blosc/lib
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/hdf5-parallel/lib
+
