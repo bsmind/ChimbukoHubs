@@ -1,0 +1,73 @@
+Bootstrap: docker
+From: ubuntu:16.04
+
+
+%labels
+    MAINTAINER Sungsoo Ha (sungsooha@bnl.gov)
+
+%post
+    # post is run after entering the container env.
+    # need to install some development tools to build your code
+
+    # create directory
+    mkdir -p /Downloads
+
+    # ------------------------------------------------------------------------
+    # Install necessary ubuntu packages
+    # ------------------------------------------------------------------------
+    apt-get update
+    apt-get install -y apt-file
+    apt-get update
+
+    apt-get install -y build-essential wget git-core libtool libtool-bin autoconf subversion
+    apt-get install -y gfortran pkg-config vim
+
+    apt-get update
+    apt-get install -y software-properties-common python-software-properties
+
+    add-apt-repository ppa:ubuntu-toolchain-r/test
+    apt-get update
+    apt-get install -y gcc-8 g++-8
+    update-alternatives \
+        --install /usr/bin/gcc gcc /usr/bin/gcc-8 60 \
+        --slave /usr/bin/g++ g++ /usr/bin/g++-8
+    gcc --version
+    g++ --version
+
+    apt-get install -y python3 python3-dev
+    apt-get install -y python3-pip python3-tk
+
+    ln -sfn /usr/bin/python3.5 /usr/bin/python
+    python --version
+    python3 --version
+
+    # install python venv
+    pip3 install virtualenv
+
+
+    cd /opt
+    virtualenv venv
+    . /opt/venv/bin/activate
+
+    apt-get install -y openmpi-common openmpi-bin libopenmpi-dev
+    apt-get install -y python-cheetah python-yaml
+
+    pip3 install numpy mpi4py matplotlib
+
+    cd /Downloads
+    wget https://github.com/Kitware/CMake/releases/download/v3.13.4/cmake-3.13.4-Linux-x86_64.tar.gz
+    tar xvfz cmake-3.13.4-Linux-x86_64.tar.gz -C /opt
+    export PATH=${PATH}:/opt/cmake-3.13.4-Linux-x86_64/bin
+
+%environment
+    # define environment variables here
+    # These vars will be set during calls to 'shell', 'exec',
+    # or 'run' but will not be set during the previous 'post'
+    # section of the recipe file.
+    # So, if you need then, define them there as well!
+    export PATH=${PATH}:/opt/cmake-3.13.4-Linux-x86_64/bin
+    . /opt/venv/bin/activate
+
+%runscript
+    # run script
+
