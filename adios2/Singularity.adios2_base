@@ -43,7 +43,11 @@ From: bsmind/ChimbukoHubs:ubuntu
     cd /Downloads/adiosvm/adiospackages
     tar zxf sz-1.4.13.0.tar.gz
     cd /Downloads/adiosvm/adiospackages/sz-1.4.13.0
-    ./configure --prefix=/opt/SZ --with-pic --disable-shared --disable-fortran --disable-maintainer-mode
+    ./configure --prefix=/opt/SZ \
+                --with-pic \
+                --disable-shared \
+                --disable-fortran \
+                --disable-maintainer-mode
     make
     make install
 
@@ -51,7 +55,9 @@ From: bsmind/ChimbukoHubs:ubuntu
     git clone https://github.com/Blosc/c-blosc.git
     mkdir -p /Downloads/c-blosc/build
     cd /Downloads/c-blosc/build
-    cmake -DCMAKE_INSTALL_PREFIX=/opt/blosc ..
+    cmake -DCMAKE_INSTALL_PREFIX=/opt/blosc \
+          -DBUILD_TESTS=OFF \
+          ..
     make 
     make install
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/blosc/lib
