@@ -17,7 +17,7 @@ From: centos
     mkdir -p $DOWNLOAD_PATH
 
     MINICONDA_INSTALL_FILE=Miniconda$CONDAVER-$VERSION-Linux-x86_64.sh
-    wget https://repo/continuum.io/miniconda/$MINICONDA_INSTALL_FILE -P $DOWNLOAD_PATH
+    wget https://repo.continuum.io/miniconda/$MINICONDA_INSTALL_FILE -P $DOWNLOAD_PATH
     chmod +x $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE
     $DOWNLOAD_PATH/$MINICONDA_INSTALL_FILE -b -p $PREFIX_PATH -u
 
